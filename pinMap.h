@@ -13,9 +13,9 @@
 // VIN
 
 const int Pot_Dial_1 = A0;  // Tensioner Speed
-const int Pot_Dial_2 = A1;  // 
-const int Pot_Dial_3 = A2;
-const int UNUSED = A3;
+const int Pot_Dial_2 = A1;  // Spool Speed
+const int Pot_Dial_3 = A2;  // Fan Speed/Intensity
+const int Pot_Dial_4 = A3;  // Filament Diameter
 const int Display_Clock = A4;
 const int Display_Data = A5;
 

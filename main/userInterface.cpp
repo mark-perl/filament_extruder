@@ -1,5 +1,9 @@
 #include "userInterface.h"
 
+volatile bool userInterface::selectPressed = false;
+volatile bool userInterface::enterPressed = false;
+// volatile bool userInterface::limitPressed = false;
+
 userInterface::userInterface()
 {
     pinMode(SW_Select, INPUT);
@@ -8,6 +12,10 @@ userInterface::userInterface()
     pinMode(SW_Auto, INPUT);
     pinMode(Encoder_Dial_A, INPUT);
     pinMode(Encoder_Dial_B, INPUT);
+
+    attachInterrupt(digitalPinToInterrupt(SW_Select), buttonPressedInterrupt, RISING);
+    attachInterrupt(digitalPinToInterrupt(SW_Enter), buttonPressedInterrupt, RISING);
+    // attachInterrupt(digitalPinToInterrupt(SW_Limit), buttonPressed, RISING);
 }
 
 userInterface::~userInterface()
@@ -15,46 +23,11 @@ userInterface::~userInterface()
 
 }
 
-bool userInterface::readSelectButton()
+void userInterface::buttonPressedInterrupt()
 {
-    if (digitalRead(SW_Select)) {
-        if (!selectPressed) {
-            selectPressed = true;
-            return true;
-        }
-    }
-    else {
-        selectPressed = false;
-        return false;
-    }
-}
-
-bool userInterface::readEnterButton()
-{
-    if (digitalRead(SW_Enter)) {
-        if (!enterPressed) {
-            enterPressed = true;
-            return true;
-        }
-    }
-    else {
-        enterPressed = false;
-        return false;
-    }
-}
-
-bool userInterface::readLimitSwitch()
-{
-    if (digitalRead(SW_Limit)) {
-        if (!limitPressed) {
-            limitPressed = true;
-            return true;
-        }
-    }
-    else {
-        limitPressed = false;
-        return false;
-    }
+    if (digitalRead(SW_Select)) {selectPressed = true;}
+    if (digitalRead(SW_Enter))  {enterPressed = true;}
+    // if (digitalRead(SW_Limit))  {limitPressed = true;}
 }
 
 int userInterface::readMode()

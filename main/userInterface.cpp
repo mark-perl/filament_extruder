@@ -1,13 +1,14 @@
 #include "userInterface.h"
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-// #include <RotaryEncoder.h>
+#include <RotaryEncoder.h>
 
-// RotaryEncoder dial(Encoder_Dial_A, Encoder_Dial_B, RotaryEncoder::LatchMode::TWO03);
+RotaryEncoder dial(Encoder_Dial_A, Encoder_Dial_B, RotaryEncoder::LatchMode::FOUR3);
 LiquidCrystal_I2C display(0x27, 4, 20);
 
 volatile bool userInterface::selectPressed = false;
 volatile bool userInterface::enterPressed = false;
+volatile int userInterface::dialValue = 0;
 // volatile bool userInterface::limitPressed = false;
 
 userInterface::userInterface()
@@ -16,11 +17,9 @@ userInterface::userInterface()
     pinMode(SW_Enter, INPUT);
     pinMode(SW_Manual, INPUT);
     pinMode(SW_Auto, INPUT);
-    pinMode(Encoder_Dial_A, INPUT);
-    pinMode(Encoder_Dial_B, INPUT);
 
-    // attachInterrupt(digitalPinToInterrupt(Encoder_Dial_A), encoderInterrupt, CHANGE);
-    // attachInterrupt(digitalPinToInterrupt(Encoder_Dial_B), encoderInterrupt, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(Encoder_Dial_A), encoderInterrupt, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(Encoder_Dial_B), encoderInterrupt, CHANGE);
     
     attachInterrupt(digitalPinToInterrupt(SW_Select), buttonPressedInterrupt, RISING);
     attachInterrupt(digitalPinToInterrupt(SW_Enter), buttonPressedInterrupt, RISING);
@@ -48,10 +47,11 @@ void userInterface::updateDisplay(String text)
     display.print(text);
 }
 
-// void userInterface::encoderInterrupt()
-// {
-//     dial.tick();
-// }
+void userInterface::encoderInterrupt()
+{
+    dial.tick();
+    dialValue = dial.getPosition();
+}
 
 void userInterface::buttonPressedInterrupt()
 {
@@ -62,15 +62,15 @@ void userInterface::buttonPressedInterrupt()
 int userInterface::readMode()
 {
     if (digitalRead(SW_Auto)) {
-        Serial.println("Mode: Auto");
+        // Serial.println("Mode: Auto");
         return AUTO;
     }
     else if (digitalRead(SW_Manual)) {
-        Serial.println("Mode: Manual");
+        // Serial.println("Mode: Manual");
         return MANUAL;
     }
     else {
-        Serial.println("Mode: Off");
+        // Serial.println("Mode: Off");
         return OFF;
     }
 }

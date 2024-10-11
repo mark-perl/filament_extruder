@@ -42,7 +42,10 @@ void loop(){
     }
 
     UI.mode = UI.readMode();
-    delay(1000);
+
+    Serial.println(UI.dialValue);
+    
+    delay(100);
 
     switch (UI.mode)
     {

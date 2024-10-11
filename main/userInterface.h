@@ -17,6 +17,7 @@ public:
     int readMode();
 
     // LCD Display
+    void displayInit();
     void updateDisplay(String text);
     // void editParameter(int variable);
     // void displayOverview(int mode);
@@ -26,6 +27,7 @@ public:
     // static volatile bool limitPressed;
     
     int mode = OFF;
+    static volatile int dialValue;
 
 private:
 

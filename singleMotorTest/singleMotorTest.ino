@@ -5,14 +5,15 @@
 // Ensure AccelStepper lib installed
 
 // Arduino Pinouts for CNC shield
-const int xStep = 2;
+const int xStep = 4;
 const int yStep = 3;
 const int zStep = 4;
-const int aStep = 12;
-const int xDir = 5;
+const int xDir = 7;
 const int yDir = 6;
 const int zDir = 7;
-const int aDir = 13;
+const int Manual = 12;
+const int Auto = 11;
+
 
 // Define motor objects
 AccelStepper motor_x (1, xStep, xDir);
@@ -25,12 +26,14 @@ void setup() {
 
   pinMode(xStep, OUTPUT);
   pinMode(xDir, OUTPUT);
+  pinMode(Auto,INPUT);
+  pinMode(Manual,INPUT);
 
   // Set parameters for motor
   motor_x.setMaxSpeed(1600*10); // steps/s
 
   motor_x.setSpeed(speed);      
-
+  Serial.println("begin");
 }
 
 void loop() {
@@ -40,9 +43,15 @@ void loop() {
     speed = speed;
     Serial.print("New Speed: ");
     Serial.println(speed);
-    motor_x.setSpeed(speed * 8);  
+    motor_x.setSpeed(speed);  
   }
-
+  // if (digitalRead(Auto)){
+  //   Serial.println("auto");
+  // }
+  // if (digitalRead(Manual)){
+  //   Serial.println("manual");
+  // }
+  // delay(50);
   motor_x.runSpeed();       
       
 }

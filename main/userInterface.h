@@ -11,21 +11,22 @@ public:
     userInterface();
     ~userInterface();
 
+    static void encoderInterrupt();
     // User Inputs
     static void buttonPressedInterrupt();
     int readMode();
 
     // LCD Display
-    void editParameter(int variable);
-    void displayOverview(int mode);
+    void updateDisplay(String text);
+    // void editParameter(int variable);
+    // void displayOverview(int mode);
 
     static volatile bool selectPressed;
     static volatile bool enterPressed;
-    static volatile bool limitPressed;
+    // static volatile bool limitPressed;
     
     int mode = OFF;
 
 private:
-
 
 };

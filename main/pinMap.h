@@ -24,11 +24,11 @@ const int SW_Auto = 11;
 const int Fan_1 = 10;
 const int Fan_2 = 9;   
 const int Fan_3 = 8;     
-const int Z_Dir = 7;
-const int Y_Dir = 6;
-const int X_Dir = 5;
-const int Z_Step = 4;
-const int Y_Step = 3;
-const int X_Step = 2;
+const int M3_Dir = 7;  // spooler
+const int M2_Dir = 6;  // feeder
+const int M1_Dir = 5;  // tensioner
+const int M3_Step = 4; // spooler
+const int M2_Step = 3; // feeder
+const int M1_Step = 2; // tensioner
 // GND
 // RESET

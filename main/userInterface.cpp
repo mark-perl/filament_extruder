@@ -1,10 +1,10 @@
 #include "userInterface.h"
 #include <Wire.h>
-// #include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal_I2C.h>
 // #include <RotaryEncoder.h>
 
 // RotaryEncoder dial(Encoder_Dial_A, Encoder_Dial_B, RotaryEncoder::LatchMode::TWO03);
-// LiquidCrystal_I2C display(0x27, 4, 20);
+LiquidCrystal_I2C display(0x27, 4, 20);
 
 volatile bool userInterface::selectPressed = false;
 volatile bool userInterface::enterPressed = false;
@@ -24,9 +24,6 @@ userInterface::userInterface()
     
     attachInterrupt(digitalPinToInterrupt(SW_Select), buttonPressedInterrupt, RISING);
     attachInterrupt(digitalPinToInterrupt(SW_Enter), buttonPressedInterrupt, RISING);
-    // Serial.print("here");
-    // display.init();
-    // display.backlight(); 
 }
 
 userInterface::~userInterface()
@@ -34,13 +31,22 @@ userInterface::~userInterface()
 
 }
 
-// void userInterface::updateDisplay(String text)
-// {
-//     Serial.print(text);
-//     display.clear();
-//     display.setCursor(0,0);
-//     display.print(text);
-// }
+void userInterface::displayInit()
+{
+    display.init();
+    display.backlight(); 
+    display.clear();
+    display.setCursor(1,1);
+    display.print("Hello");
+}
+
+void userInterface::updateDisplay(String text)
+{
+    Serial.print(text);
+    display.clear();
+    display.setCursor(0,0);
+    display.print(text);
+}
 
 // void userInterface::encoderInterrupt()
 // {

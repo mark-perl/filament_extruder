@@ -8,6 +8,7 @@ parameters autoParams;
 
 void setup(){
     Serial.begin(9600);
+    UI.displayInit();
 
     // set default manual params
     manualParams.spool_speed = 100;
@@ -30,14 +31,14 @@ void loop(){
         UI.selectPressed = false;
         // perform select actions
         Serial.println("select pressed");
-        // UI.updateDisplay("select pressed");
+        UI.updateDisplay("select pressed");
     }
 
     if (UI.enterPressed){
         UI.enterPressed = false;
         // perform enter actions
         Serial.println("enter pressed");
-        // UI.updateDisplay("enter pressed");
+        UI.updateDisplay("enter pressed");
     }
 
     UI.mode = UI.readMode();

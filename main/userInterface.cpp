@@ -1,7 +1,4 @@
 #include "userInterface.h"
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-#include <RotaryEncoder.h>
 
 RotaryEncoder dial(Encoder_Dial_A, Encoder_Dial_B, RotaryEncoder::LatchMode::FOUR3);
 LiquidCrystal_I2C display(0x27, 4, 20);
@@ -9,10 +6,10 @@ LiquidCrystal_I2C display(0x27, 4, 20);
 volatile bool userInterface::selectPressed = false;
 volatile bool userInterface::enterPressed = false;
 volatile int userInterface::dialValue = 0;
-// volatile bool userInterface::limitPressed = false;
+unsigned long userInterface::buttonPressedMillis = 0;
 
 userInterface::userInterface()
-{
+{ 
     pinMode(SW_Select, INPUT);
     pinMode(SW_Enter, INPUT);
     pinMode(SW_Manual, INPUT);
@@ -39,12 +36,45 @@ void userInterface::displayInit()
     display.print("Hello");
 }
 
-void userInterface::updateDisplay(String text)
+void userInterface::updateDisplay(String text, float value)
 {
-    Serial.print(text);
     display.clear();
+
     display.setCursor(0,0);
     display.print(text);
+
+    display.print(": ");
+
+    char valueStr[10];
+    dtostrf(value, 3, 0, valueStr);
+    display.print(value);
+}
+
+Parameter userInterface::updateParameter(Parameter param)
+{   
+    if (lastParamIndex == -1){
+        dial.setPosition(0);
+        dialValue = 0;
+    }
+
+    if (param.index != lastParamIndex){
+        lastParamIndex = param.index;
+        
+        display.clear();
+        display.setCursor(0,1);
+        display.print(param.name);
+
+        display.setCursor(0,2);
+        display.print(floatToString(param.value));
+        display.print(" "+param.units);
+    }
+
+    if (dialValue != 0){
+        param.value += dialValue;
+        lastParamIndex = -1;
+    }
+   
+    return param;
 }
 
 void userInterface::encoderInterrupt()
@@ -55,8 +85,11 @@ void userInterface::encoderInterrupt()
 
 void userInterface::buttonPressedInterrupt()
 {
-    if (digitalRead(SW_Select)) {selectPressed = true;}
-    if (digitalRead(SW_Enter))  {enterPressed = true;}
+    if ((millis() - buttonPressedMillis) > 500){
+        if (digitalRead(SW_Select)) {selectPressed = true;}
+        if (digitalRead(SW_Enter))  {enterPressed = true;}
+        buttonPressedMillis = millis();
+    }
 }
 
 int userInterface::readMode()
@@ -75,3 +108,9 @@ int userInterface::readMode()
     }
 }
 
+String userInterface::floatToString(float value)
+{
+    char valueString[10];
+    dtostrf(value, 0, 0, valueString);
+    return valueString;
+}

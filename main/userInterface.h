@@ -1,5 +1,9 @@
 #pragma once
 #include "pinMap.h"
+#include "parameters.h"
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <RotaryEncoder.h>
 
 #define OFF 0
 #define AUTO 1
@@ -18,8 +22,8 @@ public:
 
     // LCD Display
     void displayInit();
-    void updateDisplay(String text);
-    // void editParameter(int variable);
+    void updateDisplay(String text, float value);
+    Parameter updateParameter(Parameter param);
     // void displayOverview(int mode);
 
     static volatile bool selectPressed;
@@ -30,5 +34,10 @@ public:
     static volatile int dialValue;
 
 private:
+    String floatToString(float value);
+
+    int lastParamIndex = -1;
+    static unsigned long buttonPressedMillis;
+
 
 };

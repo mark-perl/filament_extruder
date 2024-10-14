@@ -1,26 +1,34 @@
 #include "pinMap.h"
 #include "userInterface.h"
-#include "parameters.h"
+#include "control.h"
+// #include "parameters.h"
 
 userInterface UI;
-parameters manualParams;
-parameters autoParams;
+control Control;
+
+Parameter tens_speed(50.0f, "Tensioner Speed", "steps/s", 0);
+Parameter spool_speed(50.0f, "Spooler Speed", "steps/s", 1);
+Parameter feeder_speed(0.0f, "Feeder Speed", "steps/s", 2);
+Parameter fans_on(5, "Fans On", "/5", 3);
+
+Parameter autoParams[4] = {
+    tens_speed,
+    spool_speed,
+    feeder_speed,
+    fans_on,
+};
+Parameter manualParams[4] = {
+    tens_speed,
+    spool_speed,
+    feeder_speed,
+    fans_on,
+};
+
+int i = 0;   
 
 void setup(){
     Serial.begin(9600);
     UI.displayInit();
-
-    // set default manual params
-    manualParams.spool_speed = 100;
-    manualParams.feeder_speed = 100;
-    manualParams.tensioner_speed = 100;
-    manualParams.fans_on = 5;
-
-    // set default auto params
-    autoParams.spool_speed = 100;
-    autoParams.feeder_speed = 100;
-    autoParams.tensioner_speed = 100;
-    autoParams.fans_on = 5;
     
 }
 
@@ -31,21 +39,19 @@ void loop(){
         UI.selectPressed = false;
         // perform select actions
         Serial.println("select pressed");
-        UI.updateDisplay("select pressed");
+        i++;
+        if (i>4){i=0;}
+        // UI.updateDisplay("select pressed");
     }
 
     if (UI.enterPressed){
         UI.enterPressed = false;
         // perform enter actions
         Serial.println("enter pressed");
-        UI.updateDisplay("enter pressed");
+        // UI.updateDisplay("enter pressed");
     }
 
     UI.mode = UI.readMode();
-
-    Serial.println(UI.dialValue);
-    
-    delay(100);
 
     switch (UI.mode)
     {
@@ -61,6 +67,9 @@ void loop(){
 
     case MANUAL:
         // send move commands at manualParamas values
+        manualParams[i] = UI.updateParameter(manualParams[i]);
+        Control.move(manualParams);
+        
         break;
 
     default:

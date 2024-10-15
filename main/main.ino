@@ -1,35 +1,38 @@
 #include "pinMap.h"
 #include "userInterface.h"
 #include "control.h"
-// #include "parameters.h"
+#include "parameters.h"
 
 userInterface UI;
 control Control;
 
 Parameter tens_speed(50.0f, "Tensioner Speed", "steps/s", 0);
-Parameter spool_speed(50.0f, "Spooler Speed", "steps/s", 1);
-Parameter feeder_speed(0.0f, "Feeder Speed", "steps/s", 2);
-Parameter fans_on(5, "Fans On", "/5", 3);
+Parameter feeder_speed(0.0f, "Feeder Speed", "steps/s", 1);
+Parameter spool_speed(50.0f, "Spooler Speed", "steps/s", 2);
+Parameter fans_on(0, "Fans On", "/5", 3);
 
 Parameter autoParams[4] = {
-    tens_speed,
-    spool_speed,
-    feeder_speed,
-    fans_on,
-};
-Parameter manualParams[4] = {
-    tens_speed,
-    spool_speed,
-    feeder_speed,
-    fans_on,
+    tens_speed,      // 0
+    feeder_speed,    // 1
+    spool_speed,     // 2
+    fans_on,         // 3
 };
 
-int i = 0;   
+Parameter manualParams[4] = {
+    tens_speed,      // 0
+    feeder_speed,    // 1
+    spool_speed,     // 2
+    fans_on,         // 3
+};
+
+int i = 0;
+
 
 void setup(){
     Serial.begin(9600);
     UI.displayInit();
-    
+    Control.powerFans(0);
+    Control.motorsInit();
 }
 
 
@@ -37,39 +40,44 @@ void loop(){
 
     if (UI.selectPressed){
         UI.selectPressed = false;
-        // perform select actions
-        Serial.println("select pressed");
+        UI.displayMode = EDIT;
+        // Update variable for parameter selection
         i++;
         if (i>4){i=0;}
-        // UI.updateDisplay("select pressed");
     }
 
     if (UI.enterPressed){
         UI.enterPressed = false;
-        // perform enter actions
-        Serial.println("enter pressed");
-        // UI.updateDisplay("enter pressed");
+        UI.displayMode = OVERVIEW;
+
+
     }
 
-    UI.mode = UI.readMode();
+    UI.mode = UI.readMode();    
 
     switch (UI.mode)
     {
     case OFF:
-        // turn off
-        // dont send move commands
+        // OFF: Don't move motors
+        Control.powerFans(0);   // Turn fans off
         break;
     
     case AUTO:
-        // control system to set autoParams
-        // send move commands at autoParams values
+    if (UI.displayMode == EDIT){
+        autoParams[i] = UI.updateParameter(autoParams[i]);
+    }
+        Control.setParams(autoParams);
+
+        Control.moveMotors();
         break;
 
     case MANUAL:
-        // send move commands at manualParamas values
+    if (UI.displayMode == EDIT){
         manualParams[i] = UI.updateParameter(manualParams[i]);
-        Control.move(manualParams);
-        
+    }
+        Control.setParams(manualParams);
+
+        Control.moveMotors();
         break;
 
     default:

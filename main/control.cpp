@@ -20,15 +20,20 @@ control::control()
     pinMode(Fan_3, OUTPUT);
 
     pinMode(SW_Limit, INPUT);
-    // tensioner.setMaxSpeed(1000);
-    // feeder.setMaxSpeed(1000);
-    // spooler.setMaxSpeed(1000);
+    
 
 }
 
 control::~control()
 {
 
+}
+
+void control::motorsInit()
+{
+    tensioner.setMaxSpeed(1200);
+    feeder.setMaxSpeed(1200);
+    spooler.setMaxSpeed(1200);
 }
 
 int control::powerFans(int fans_on)
@@ -72,17 +77,18 @@ int control::powerFans(int fans_on)
     return fans_on;
 }
 
-void control::move(Parameter params[]){
-    tensioner.setSpeed(params[0].value);
-    spooler.setSpeed(params[1].value);
-    feeder.setSpeed(params[2].value);
-
-    tensioner.runSpeed();
-    spooler.runSpeed();
-    feeder.runSpeed();
+void control::setParams(Parameter params[]){
+    tensioner.setSpeed(params[0].value * TENS_MICROSTEPS);
+    feeder.setSpeed(params[1].value * FEEDER_MICROSTEPS);
+    spooler.setSpeed(params[2].value * SPOOL_MICROSTEPS);
 
     params[3].value = powerFans(params[3].value);
-    Serial.println(params[1].value);
+}
+
+void control::moveMotors(){
+    tensioner.runSpeed();
+    feeder.runSpeed();
+    spooler.runSpeed();
 }
 
 void control::feederControl()

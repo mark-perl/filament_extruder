@@ -10,11 +10,14 @@ public:
     control();
     ~control();
     
-    void move(Parameter params[]);
+    void motorsInit();
+    void setParams(Parameter params[]);
+    void moveMotors();
+    int powerFans(int fans_on);
+
 
 private:
     void feederControl();
-    int powerFans(int fans_on);
 
 
 };

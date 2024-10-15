@@ -16,7 +16,7 @@ const int Auto = 11;
 
 
 // Define motor objects
-AccelStepper motor_x (1, xStep, xDir);
+AccelStepper motor_x (1, zStep, zDir);
 AccelStepper motor_y (1, yStep, yDir);
 
 int speed = 0;

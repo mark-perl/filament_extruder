@@ -1,13 +1,17 @@
 #pragma once
+#include <Arduino.h>
 #include "pinMap.h"
 #include "parameters.h"
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <RotaryEncoder.h>
 
-#define OFF 0
-#define AUTO 1
-#define MANUAL 2
+#define OFF     0
+#define AUTO    1
+#define MANUAL  2
+
+#define OVERVIEW 1
+#define EDIT     2
 
 class userInterface
 {
@@ -16,22 +20,20 @@ public:
     ~userInterface();
 
     static void encoderInterrupt();
-    // User Inputs
     static void buttonPressedInterrupt();
+
     int readMode();
 
-    // LCD Display
     void displayInit();
     void updateDisplay(String text, float value);
     Parameter updateParameter(Parameter param);
-    // void displayOverview(int mode);
 
     static volatile bool selectPressed;
     static volatile bool enterPressed;
-    // static volatile bool limitPressed;
-    
-    int mode = OFF;
     static volatile int dialValue;
+
+    int mode = OFF;
+    int displayMode = OVERVIEW;
 
 private:
     String floatToString(float value);

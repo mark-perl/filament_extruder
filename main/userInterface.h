@@ -25,8 +25,10 @@ public:
     int readMode();
 
     void displayInit();
-    void updateDisplay(String text, float value);
+    void overviewDisplay(Parameter params[]);
     Parameter updateParameter(Parameter param);
+    void resetDial();
+    void offDisplay();
 
     static volatile bool selectPressed;
     static volatile bool enterPressed;
@@ -35,8 +37,13 @@ public:
     int mode = OFF;
     int displayMode = OVERVIEW;
 
+    bool updateDisplay = false;
+
 private:
-    String floatToString(float value);
+    String intToString(int value, int dp);
+    String valueString;
+    int stringLen;
+    int decimalLoc;
 
     int lastParamIndex = -1;
     static unsigned long buttonPressedMillis;

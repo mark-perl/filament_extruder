@@ -36,44 +36,58 @@ void userInterface::displayInit()
     display.print("Hello");
 }
 
-void userInterface::updateDisplay(String text, float value)
+void userInterface::overviewDisplay(Parameter params[])
 {
-    display.clear();
+    if (updateDisplay) {
+        updateDisplay = false;
 
-    display.setCursor(0,0);
-    display.print(text);
+        display.clear();
 
-    display.print(": ");
+        for (int i = 0; i < 4; i++) {
+            display.setCursor(0,i);
+            display.print(params[i].name + ": ");
+            display.print(intToString(params[i].value, params[i].divisor));
+        }
+    }
+}
 
-    char valueStr[10];
-    dtostrf(value, 3, 0, valueStr);
-    display.print(value);
+void userInterface::offDisplay()
+{
+    if (updateDisplay) {
+        updateDisplay = false;
+
+        display.clear();
+        display.setCursor(0,1);
+        display.print("OFF");
+    }
 }
 
 Parameter userInterface::updateParameter(Parameter param)
-{   
-    if (lastParamIndex == -1){
-        dial.setPosition(0);
-        dialValue = 0;
-    }
-
-    if (param.index != lastParamIndex){
-        lastParamIndex = param.index;
+{ 
+    if (updateDisplay) {
+        updateDisplay = false;
         
         display.clear();
-        display.setCursor(0,1);
-        display.print(param.name);
+        display.setCursor(0,0);
+        display.print("EDIT");
 
         display.setCursor(0,2);
-        display.print(floatToString(param.value));
+        display.print(param.name);
+
+        display.setCursor(0,3);
+        display.print(intToString(param.value, param.divisor));
         display.print(" "+param.units);
     }
 
     if (dialValue != 0){
+        // Update value from dial input
         param.value += dialValue;
-        lastParamIndex = -1;
+        // Reset dial to 0
+        resetDial();
+        // Prompt to update display
+        updateDisplay = true;   
     }
-   
+
     return param;
 }
 
@@ -85,7 +99,7 @@ void userInterface::encoderInterrupt()
 
 void userInterface::buttonPressedInterrupt()
 {
-    if ((millis() - buttonPressedMillis) > 500){
+    if ((millis() - buttonPressedMillis) > 300){
         if (digitalRead(SW_Select)) {selectPressed = true;}
         if (digitalRead(SW_Enter))  {enterPressed = true;}
         buttonPressedMillis = millis();
@@ -108,9 +122,21 @@ int userInterface::readMode()
     }
 }
 
-String userInterface::floatToString(float value)
+String userInterface::intToString(int value, int divisor)
 {
-    char valueString[10];
-    dtostrf(value, 0, 0, valueString);
-    return valueString;
+    valueString = String(value);
+    if (divisor == 0) {
+        return valueString;
+    }
+    else {
+        stringLen = valueString.length();
+        decimalLoc = valueString.length() - divisor;
+        return valueString.substring(0,decimalLoc) + '.' + valueString.substring(decimalLoc, stringLen);
+    }
+}
+
+void userInterface::resetDial()
+{
+    dial.setPosition(0);
+    dialValue = 0;
 }

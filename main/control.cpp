@@ -20,8 +20,6 @@ control::control()
     pinMode(Fan_3, OUTPUT);
 
     pinMode(SW_Limit, INPUT);
-    
-
 }
 
 control::~control()
@@ -81,7 +79,6 @@ void control::setParams(Parameter params[]){
     tensioner.setSpeed(params[0].value * TENS_MICROSTEPS);
     feeder.setSpeed(params[1].value * FEEDER_MICROSTEPS);
     spooler.setSpeed(params[2].value * SPOOL_MICROSTEPS);
-
     params[3].value = powerFans(params[3].value);
 }
 

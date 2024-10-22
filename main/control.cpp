@@ -13,7 +13,8 @@ AccelStepper spooler   (1, M3_Step, M3_Dir);
 #define FANS_ALWAYS_ON      2
 
 #define FEEDER_PITCH_MM         8.0
-#define FEEDER_HOME_POS_MM      -108.0  // Offset from button to home pos
+// #define FEEDER_HOME_POS_MM      -108.0  // Offset from button to home pos
+#define FEEDER_HOME_POS_MM      0
 #define FEEDER_HOME_POS_STEPS   FEEDER_HOME_POS_MM / FEEDER_PITCH_MM * 200.0
 
 
@@ -56,15 +57,9 @@ void control::feederHome()
 
     // Limit switch hit
     feeder.setCurrentPosition(0);
-    // feeder.moveTo(FEEDER_HOME_POS_STEPS * FEEDER_MICROSTEPS);
-    // feeder.setSpeed(600 * FEEDER_MICROSTEPS);
-
-    // while (feeder.isRunning()){
-    //     feeder.runSpeedToPosition();
-    // }
+    
     feeder.runToNewPosition(FEEDER_HOME_POS_STEPS * FEEDER_MICROSTEPS);
     
-    Serial.println("Done");
     feeder.setCurrentPosition(0);
 }
 

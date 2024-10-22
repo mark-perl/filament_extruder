@@ -9,22 +9,23 @@ control Control;
 Parameter tens_speed(50, "Tensioner Speed", "steps/s", 0);
 Parameter feeder_speed(0, "Feeder Speed", "steps/s", 0);
 Parameter spool_speed(50, "Spooler Speed", "steps/s", 0);
-Parameter fans_on(0, "Fans On", "/3", 0);
+Parameter fans_on(2, "Fans On", "/5", 0);
 
 Parameter goal_diam(175, "Goal Diameter", "mm", 2);
 
 Parameter autoParams[4] = {
     tens_speed,      // 0
-    feeder_speed,    // 1
-    spool_speed,     // 2
-    fans_on,         // 3
+    spool_speed,     // 1
+    fans_on,         // 2
+    feeder_speed,    // 3
+
 };
 
 Parameter manualParams[4] = {
     tens_speed,      // 0
-    feeder_speed,    // 1
-    spool_speed,     // 2
-    fans_on,         // 3
+    spool_speed,     // 1
+    fans_on,         // 2
+    feeder_speed,    // 3
 };
 
 int i = 0;
@@ -32,9 +33,14 @@ int i = 0;
 
 void setup(){
     Serial.begin(9600);
+
     UI.displayInit();
-    Control.powerFans(0);
     Control.motorsInit();
+
+    Control.powerFans(0);
+    Control.feederHome();
+
+    UI.updateDisplay = true;
 }
 
 
@@ -46,7 +52,7 @@ void loop(){
         UI.updateDisplay = true;
         // Update variable for parameter selection
         i++;
-        if (i > 3) {i = 0;}
+        if (i > 2) {i = 0;}
         // Reset dial
         UI.resetDial();
     }

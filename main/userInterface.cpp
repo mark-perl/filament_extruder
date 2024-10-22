@@ -32,8 +32,12 @@ void userInterface::displayInit()
     display.init();
     display.backlight(); 
     display.clear();
-    display.setCursor(1,1);
-    display.print("Hello");
+    display.setCursor(0,0);
+    display.print("Filament Extruder");
+    display.setCursor(0,1);
+    display.print("Setup:");
+    display.setCursor(3,3);
+    display.print("Please Wait...");
 }
 
 void userInterface::overviewDisplay(Parameter params[])

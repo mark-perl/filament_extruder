@@ -2,9 +2,11 @@
 #include "userInterface.h"
 #include "control.h"
 #include "parameters.h"
+#include "measurement.h"
 
 userInterface UI;
 control Control;
+measurement Meas;
 
 Parameter tens_speed(50, "Tensioner Speed", "steps/s", 0);
 Parameter feeder_speed(0, "Feeder Speed", "steps/s", 0);
@@ -87,8 +89,13 @@ void loop(){
 
         // TODO: Update parameter from control system
 
+        // Serial.println(Meas.readCaliper());
+
         Control.setParams(autoParams);
         Control.moveMotors();
+
+        
+
         break;
 
     case MANUAL:
@@ -97,6 +104,7 @@ void loop(){
         }
         if (UI.displayMode == OVERVIEW){
             UI.overviewDisplay(manualParams);
+
         }
 
         Control.setParams(manualParams);

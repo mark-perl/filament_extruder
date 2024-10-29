@@ -13,6 +13,7 @@ Parameter feeder_speed(0, "Feeder Speed", "steps/s", 0);
 Parameter spool_speed(50, "Spooler Speed", "steps/s", 0);
 Parameter fans_on(2, "Fans On", "/5", 0);
 
+Parameter meas_diam(0, "Meas. D", "mm", 2);
 Parameter goal_diam(175, "Goal Diameter", "mm", 2);
 
 Parameter autoParams[4] = {
@@ -31,6 +32,7 @@ Parameter manualParams[4] = {
 };
 
 int i = 0;
+unsigned long lastMillis = 0;
 
 
 void setup(){
@@ -41,6 +43,7 @@ void setup(){
 
     Control.powerFans(0);
     Control.feederHome();
+    Meas.zeroCaliper();
 
     UI.updateDisplay = true;
 }
@@ -48,28 +51,42 @@ void setup(){
 
 void loop(){
 
-    if (UI.selectPressed){
-        UI.selectPressed = false;
-        UI.displayMode = EDIT;
-        UI.updateDisplay = true;
-        // Update variable for parameter selection
-        i++;
-        if (i > 2) {i = 0;}
-        // Reset dial
-        UI.resetDial();
-    }
+    if ((millis() - lastMillis) > 200)
+    {
+        // Only update every 200ms
+        lastMillis = millis();
 
-    if (UI.enterPressed){
-        UI.enterPressed = false;
-        UI.displayMode = OVERVIEW;
-        UI.updateDisplay = true;
-    }
+        if (UI.selectPressed){
+            UI.selectPressed = false;
+            UI.displayMode = EDIT;
+            UI.updateDisplay = true;
+            // Update variable for parameter selection
+            i++;
+            if (i > 2) {i = 0;}
+            // Reset dial
+            UI.resetDial();
+        }
 
-    if (UI.mode != UI.readMode()) {
-        UI.mode = UI.readMode();
-        UI.updateDisplay = true;
-        UI.displayMode = OVERVIEW;
+        if (UI.enterPressed){
+            UI.enterPressed = false;
+            UI.displayMode = OVERVIEW;
+            UI.updateDisplay = true;
+        }
+
+        if (UI.mode != UI.readMode()) {
+            UI.mode = UI.readMode();
+            UI.updateDisplay = true;
+            UI.displayMode = OVERVIEW;
+        }
+
+        if (meas_diam.value = Meas.readCaliper()) {
+            meas_diam.value = Meas.readCaliper();
+            if (UI.mode != OFF) {
+                UI.updateMeasDiameter(meas_diam);
+            }
+        }
     }
+    
 
     switch (UI.mode)
     {
@@ -84,7 +101,7 @@ void loop(){
             goal_diam = UI.updateParameter(goal_diam);
         }
         if (UI.displayMode == OVERVIEW){
-            UI.overviewDisplay(autoParams);
+            UI.overviewDisplay(autoParams, meas_diam);
         }
 
         // TODO: Update parameter from control system
@@ -103,7 +120,7 @@ void loop(){
             manualParams[i] = UI.updateParameter(manualParams[i]);
         }
         if (UI.displayMode == OVERVIEW){
-            UI.overviewDisplay(manualParams);
+            UI.overviewDisplay(manualParams, meas_diam);
 
         }
 

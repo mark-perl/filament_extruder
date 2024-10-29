@@ -37,7 +37,7 @@ float measurement::readCaliper()
 void measurement::zeroCaliper() 
 {
   offset = readCaliper();  // Set the offset to the current value to zero out future measurements
-  Serial.println("Caliper zeroed.");
+  // Serial.println("Caliper zeroed.");
 }
 
 

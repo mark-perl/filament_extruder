@@ -25,7 +25,8 @@ public:
     int readMode();
 
     void displayInit();
-    void overviewDisplay(Parameter params[]);
+    void overviewDisplay(Parameter params[], Parameter meas_diam);
+    void updateMeasDiameter(Parameter meas_diam);
     Parameter updateParameter(Parameter param);
     void resetDial();
     void offDisplay();
@@ -37,15 +38,14 @@ public:
     int mode = OFF;
     int displayMode = OVERVIEW;
 
-    bool updateDisplay = false;
+    bool updateDisplay = true;
 
 private:
     String intToString(int value, int dp);
     String valueString;
     int stringLen;
     int decimalLoc;
-
-    int lastParamIndex = -1;
+    bool updateDisplayValue = false;
     static unsigned long buttonPressedMillis;
 
 

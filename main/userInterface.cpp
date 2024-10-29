@@ -31,6 +31,7 @@ void userInterface::displayInit()
 {
     display.init();
     display.backlight(); 
+
     display.clear();
     display.setCursor(0,0);
     display.print("Filament Extruder");
@@ -40,15 +41,20 @@ void userInterface::displayInit()
     display.print("Please Wait...");
 }
 
-void userInterface::overviewDisplay(Parameter params[])
+void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
 {
     if (updateDisplay) {
         updateDisplay = false;
 
         display.clear();
 
-        for (int i = 0; i < 4; i++) {
-            display.setCursor(0,i);
+        display.setCursor(0,0);
+        display.print(meas_diam.name + ": ");   // Measured Diameter
+        updateMeasDiameter(meas_diam);
+        display.print(" " + meas_diam.units);  
+
+        for (int i = 0; i < 3; i++) {
+            display.setCursor(0,i+1);
             display.print(params[i].name + ": ");
             display.print(intToString(params[i].value, params[i].divisor));
         }
@@ -66,9 +72,18 @@ void userInterface::offDisplay()
     }
 }
 
+void userInterface::updateMeasDiameter(Parameter meas_diam)
+{
+    display.setCursor(10,0);    // Always location of diam.
+    display.print(intToString(meas_diam.value, meas_diam.divisor));
+
+}
+
+
 Parameter userInterface::updateParameter(Parameter param)
 { 
     if (updateDisplay) {
+        // Update whole display
         updateDisplay = false;
         
         display.clear();
@@ -80,7 +95,16 @@ Parameter userInterface::updateParameter(Parameter param)
 
         display.setCursor(0,3);
         display.print(intToString(param.value, param.divisor));
-        display.print(" "+param.units);
+        display.print(" " + param.units);
+    }
+
+    if (updateDisplayValue) {
+        // Update only display value
+        updateDisplayValue = false;
+
+        display.setCursor(0,3);
+        display.print(intToString(param.value, param.divisor));
+        display.print(" " + param.units + "  ");
     }
 
     if (dialValue != 0){
@@ -88,8 +112,8 @@ Parameter userInterface::updateParameter(Parameter param)
         param.value += dialValue;
         // Reset dial to 0
         resetDial();
-        // Prompt to update display
-        updateDisplay = true;   
+        // Prompt to update display value only
+        updateDisplayValue = true;   
     }
 
     return param;
@@ -129,11 +153,19 @@ int userInterface::readMode()
 String userInterface::intToString(int value, int divisor)
 {
     valueString = String(value);
+
     if (divisor == 0) {
         return valueString;
     }
     else {
         stringLen = valueString.length();
+
+        if (stringLen <= divisor) {
+            // Add leading 0s
+            valueString = '0' * (divisor + 1 - stringLen) + valueString;
+            stringLen = valueString.length();
+        }
+
         decimalLoc = valueString.length() - divisor;
         return valueString.substring(0,decimalLoc) + '.' + valueString.substring(decimalLoc, stringLen);
     }

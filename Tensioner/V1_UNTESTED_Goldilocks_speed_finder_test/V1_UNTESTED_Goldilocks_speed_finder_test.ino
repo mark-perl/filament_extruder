@@ -29,6 +29,7 @@ const unsigned long updateInterval = 100; // Check every 0.1 second
 void setup() {
     // Initialize serial communication
     Serial.begin(9600);
+    Serial.println("Enter goal diameter: Select '1' = 1.75mm or '2' = 2.85mm");
 
     // Set max speed and initial speed for the motor
     motor_x.setMaxSpeed(maxSpeed); // Max speed in steps per second
@@ -36,6 +37,21 @@ void setup() {
 }
 
 void loop() {
+    if (Serial.available() > 0) {
+        String input = Serial.readStringUntil('\n');
+        input.trim(); // Remove any newline or whitespace
+
+        if (input == "1") {
+            goalDiameter = 1.75;
+            Serial.println("Goal diameter set to 1.75mm.");
+        } else if (input == "2") {
+            goalDiameter = 2.85;
+            Serial.println("Goal diameter set to 2.85mm.");
+        } else {
+            Serial.println("Invalid input. Please enter '1' or '2'.");
+        }
+    }
+    
     // Run the motor at the set speed
     motor_x.runSpeed();
 

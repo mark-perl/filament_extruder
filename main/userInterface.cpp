@@ -49,9 +49,8 @@ void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
         display.clear();
 
         display.setCursor(0,0);
-        display.print(meas_diam.name + ": ");   // Measured Diameter
+        display.print(meas_diam.name + ": ");
         updateMeasDiameter(meas_diam);
-        display.print(" " + meas_diam.units);  
 
         for (int i = 0; i < 3; i++) {
             display.setCursor(0,i+1);
@@ -74,9 +73,9 @@ void userInterface::offDisplay()
 
 void userInterface::updateMeasDiameter(Parameter meas_diam)
 {
-    display.setCursor(10,0);    // Always location of diam.
+    display.setCursor(13,0);    // Always location of diam.
     display.print(intToString(meas_diam.value, meas_diam.divisor));
-
+    display.print(meas_diam.units);
 }
 
 
@@ -162,7 +161,9 @@ String userInterface::intToString(int value, int divisor)
 
         if (stringLen <= divisor) {
             // Add leading 0s
-            valueString = '0' * (divisor + 1 - stringLen) + valueString;
+            for (int i = 0; i < (divisor + 1 - stringLen); i++) {
+                valueString.concat("0");
+            }
             stringLen = valueString.length();
         }
 

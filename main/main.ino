@@ -8,12 +8,12 @@ userInterface UI;
 control Control;
 measurement Meas;
 
-Parameter tens_speed(50, "Tensioner Speed", "steps/s", 0);
+Parameter tens_speed(150, "Tensioner Speed", "steps/s", 0);
 Parameter feeder_speed(0, "Feeder Speed", "steps/s", 0);
-Parameter spool_speed(50, "Spooler Speed", "steps/s", 0);
-Parameter fans_on(2, "Fans On", "/5", 0);
+Parameter spool_speed(150, "Spooler Speed", "steps/s", 0);
+Parameter fans_on(5, "Fans On", "/5", 0);
 
-Parameter meas_diam(0, "Meas. D", "mm", 2);
+Parameter meas_diam(0, "Meas. Diam.", "mm", 2);
 Parameter goal_diam(175, "Goal Diameter", "mm", 2);
 
 Parameter autoParams[4] = {
@@ -43,7 +43,7 @@ void setup(){
 
     Control.powerFans(0);
     Control.feederHome();
-    Meas.zeroCaliper();
+    // Meas.zeroCaliper();
 
     UI.updateDisplay = true;
 }
@@ -78,13 +78,13 @@ void loop(){
             UI.updateDisplay = true;
             UI.displayMode = OVERVIEW;
         }
-
-        if (meas_diam.value = Meas.readCaliper()) {
-            meas_diam.value = Meas.readCaliper();
-            if (UI.mode != OFF) {
-                UI.updateMeasDiameter(meas_diam);
-            }
-        }
+        UI.updateMeasDiameter(meas_diam);
+        // if (meas_diam.value = Meas.readCaliper()) {
+        //     meas_diam.value = Meas.readCaliper();
+        //     if (UI.mode != OFF) {
+        //         UI.updateMeasDiameter(meas_diam);
+        //     }
+        // }
     }
     
 

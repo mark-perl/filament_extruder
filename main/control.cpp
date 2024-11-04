@@ -5,9 +5,9 @@ AccelStepper tensioner (1, M1_Step, M1_Dir);
 AccelStepper feeder    (1, M2_Step, M2_Dir);
 AccelStepper spooler   (1, M3_Step, M3_Dir);
 
-#define TENS_MICROSTEPS     1
-#define SPOOL_MICROSTEPS    1
-#define FEEDER_MICROSTEPS   1
+#define TENS_MICROSTEPS     -8
+#define SPOOL_MICROSTEPS    8
+#define FEEDER_MICROSTEPS   8
 
 #define FANS_CONTROLLED     3
 #define FANS_ALWAYS_ON      2
@@ -19,6 +19,8 @@ AccelStepper spooler   (1, M3_Step, M3_Dir);
 #define SPOOL_WIDTH_MM          60
 #define FEEDER_END_POS_STEPS    FEEDER_HOME_POS_STEPS + SPOOL_WIDTH_MM / FEEDER_PITCH_MM * 200.0
 #define FEEDER_SPOOLER_RATIO    16.0
+
+#define SPOOLER_CONTROL_DELAY_MS    500
 
 
 control::control()
@@ -35,6 +37,7 @@ control::control()
     pinMode(Fan_3, OUTPUT);
 
     pinMode(SW_Limit, INPUT);
+    pinMode(Spooling_Pot, INPUT);
 }
 
 control::~control()
@@ -110,7 +113,8 @@ int control::powerFans(int fans_on)
 void control::setParams(Parameter params[])
 {
     tensioner.setSpeed(params[0].value * TENS_MICROSTEPS);
-    spooler.setSpeed( -1 * params[1].value * SPOOL_MICROSTEPS);
+    // params[1].value = spoolerControl(params[1].value);
+    spooler.setSpeed(params[1].value * SPOOL_MICROSTEPS);
     params[2].value = powerFans(params[2].value);
     params[3].value = feederControl(params[1].value);
     feeder.setSpeed(params[3].value * FEEDER_MICROSTEPS);
@@ -132,4 +136,27 @@ int control::feederControl(int spooler_speed)
     feeder_speed = feeder_dir * (spooler_speed / FEEDER_SPOOLER_RATIO);
 
     return feeder_speed;
+}
+
+int control::spoolerControl(int spooler_speed)
+{
+    if ((millis() - spooler_control_time) > SPOOLER_CONTROL_DELAY_MS)
+    // Only update after delay since last speed update.
+    spooler_arm_pos = analogRead(Spooling_Pot);
+
+        if (spooler_arm_pos > 800) {
+            // Slow down
+            spooler_speed -= 1;
+            spooler_control_time = millis();
+        }
+        else if (spooler_arm_pos < 300) {
+            // Speed up
+            spooler_speed += 1;
+            spooler_control_time = millis();
+        }
+
+    Serial.println(spooler_arm_pos);
+    // Serial.print("\t");
+    // Serial.println(spooler_speed);
+    return spooler_speed;
 }

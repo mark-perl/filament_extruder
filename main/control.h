@@ -22,6 +22,9 @@ private:
     int feeder_speed = 0;
     int feeder_dir = 1;
     long feeder_pos = 0;
-    int feeder_end_pos_mm = 60; 
+
+    int spoolerControl(int spooler_speed);
+    int spooler_arm_pos;
+    unsigned long spooler_control_time;
 
 };

@@ -33,6 +33,7 @@ Parameter manualParams[4] = {
 
 int i = 0;
 unsigned long lastMillis = 0;
+unsigned long lastMillisMeas = 0;
 
 
 void setup(){
@@ -78,16 +79,20 @@ void loop(){
             UI.updateDisplay = true;
             UI.displayMode = OVERVIEW;
         }
-
-        // UI.updateMeasDiameter(meas_diam);
-
-        if (meas_diam.value != Meas.readCaliper()) {
-            meas_diam.value = Meas.readCaliper();
-            if (UI.mode != OFF) {
-                UI.updateMeasDiameter(meas_diam);
-            }
-        }
     }
+    
+    // if ((millis()-lastMillisMeas) > 1000) 
+    // {
+    // lastMillisMeas = millis();
+
+    //     // if (meas_diam.value != Meas.readCaliper()) {
+    //         meas_diam.value = Meas.readCaliper();
+    //         if (UI.mode != OFF) {
+    //             UI.updateMeasDiameter(meas_diam);
+    //             Serial.println(meas_diam.value);
+    //         }
+    //     // }
+    // }
     
 
     switch (UI.mode)

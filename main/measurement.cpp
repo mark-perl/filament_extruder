@@ -23,7 +23,7 @@ float measurement::readCaliper()
     while (digitalRead(Meas_Clock) == LOW) {}
     // Wait for the clock pin to go low
     while (digitalRead(Meas_Clock) == HIGH) {}
-
+    
     // Read the data bit
     if (digitalRead(Meas_Data) == HIGH) {
       if (i < 20) value |= (1 << i);  // Build the value from bits 0-19
@@ -31,8 +31,8 @@ float measurement::readCaliper()
     }
   }
 
-  // Convert the raw value to a measurement in millimeters
-  return (value * sign) / 100.0 - offset;
+  // Convert the raw value to a measurement in millimeters *10^-3
+  return (value * sign) - offset;
 }
 
 void measurement::zeroCaliper() 

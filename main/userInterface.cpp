@@ -135,13 +135,13 @@ void userInterface::buttonPressedInterrupt()
 int userInterface::readMode()
 {   
     // SW_Mode uses one pin with voltage divider
-    // Auto = 5V (2048), Man = 2.5V (1024), Off = 0V (0)
+    // Auto = 5V (1024), Man = 2.5V (512), Off = 0V (0)
 
-    if (analogRead(SW_Mode) > 1536) {
+    if (analogRead(SW_Mode) > 768) {
         // Serial.println("Mode: Auto");
         return AUTO;
     }
-    else if (analogRead(SW_Mode) > 512) {
+    else if (analogRead(SW_Mode) > 256) {
         // Serial.println("Mode: Manual");
         return MANUAL;
     }

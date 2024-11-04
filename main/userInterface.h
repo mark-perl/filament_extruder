@@ -45,8 +45,9 @@ private:
     String valueString;
     int stringLen;
     int decimalLoc;
+    
     bool updateDisplayValue = false;
+    
     static unsigned long buttonPressedMillis;
-
 
 };

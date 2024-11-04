@@ -78,13 +78,15 @@ void loop(){
             UI.updateDisplay = true;
             UI.displayMode = OVERVIEW;
         }
-        UI.updateMeasDiameter(meas_diam);
-        // if (meas_diam.value = Meas.readCaliper()) {
-        //     meas_diam.value = Meas.readCaliper();
-        //     if (UI.mode != OFF) {
-        //         UI.updateMeasDiameter(meas_diam);
-        //     }
-        // }
+
+        // UI.updateMeasDiameter(meas_diam);
+
+        if (meas_diam.value != Meas.readCaliper()) {
+            meas_diam.value = Meas.readCaliper();
+            if (UI.mode != OFF) {
+                UI.updateMeasDiameter(meas_diam);
+            }
+        }
     }
     
 

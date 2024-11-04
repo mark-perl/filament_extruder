@@ -3,7 +3,8 @@
 
 measurement::measurement()
 {
-
+  pinMode(Meas_Clock, INPUT);
+  pinMode(Meas_Data, INPUT);
 }
 
 measurement::~measurement()
@@ -19,12 +20,12 @@ float measurement::readCaliper()
   // Read 24 bits from the caliper
   for (int i = 0; i < 24; i++) {
     // Wait for the clock pin to go high
-    while (digitalRead(I2C_Clock) == LOW) {}
+    while (digitalRead(Meas_Clock) == LOW) {}
     // Wait for the clock pin to go low
-    while (digitalRead(I2C_Clock) == HIGH) {}
+    while (digitalRead(Meas_Clock) == HIGH) {}
 
     // Read the data bit
-    if (digitalRead(I2C_Data) == HIGH) {
+    if (digitalRead(Meas_Data) == HIGH) {
       if (i < 20) value |= (1 << i);  // Build the value from bits 0-19
       if (i == 20) sign = -1;         // Set the sign bit
     }

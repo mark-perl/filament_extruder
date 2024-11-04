@@ -12,8 +12,7 @@ userInterface::userInterface()
 { 
     pinMode(SW_Select, INPUT);
     pinMode(SW_Enter, INPUT);
-    pinMode(SW_Manual, INPUT);
-    pinMode(SW_Auto, INPUT);
+    pinMode(SW_Mode, INPUT);
 
     attachInterrupt(digitalPinToInterrupt(Encoder_Dial_A), encoderInterrupt, CHANGE);
     attachInterrupt(digitalPinToInterrupt(Encoder_Dial_B), encoderInterrupt, CHANGE);
@@ -134,12 +133,15 @@ void userInterface::buttonPressedInterrupt()
 }
 
 int userInterface::readMode()
-{
-    if (digitalRead(SW_Auto)) {
+{   
+    // SW_Mode uses one pin with voltage divider
+    // Auto = 5V (2048), Man = 2.5V (1024), Off = 0V (0)
+
+    if (analogRead(SW_Mode) > 1536) {
         // Serial.println("Mode: Auto");
         return AUTO;
     }
-    else if (digitalRead(SW_Manual)) {
+    else if (analogRead(SW_Mode) > 512) {
         // Serial.println("Mode: Manual");
         return MANUAL;
     }

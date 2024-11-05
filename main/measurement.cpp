@@ -31,7 +31,7 @@ float measurement::readCaliper()
     }
   }
 
-  // Convert the raw value to a measurement in millimeters *10^-3
+  // Convert the raw value to a measurement in millimeters *10^-2
   return (value * sign) - offset;
 }
 

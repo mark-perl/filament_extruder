@@ -13,7 +13,6 @@ AccelStepper spooler   (1, M3_Step, M3_Dir);
 #define FANS_ALWAYS_ON      2
 
 #define FEEDER_PITCH_MM         8.0
-// #define FEEDER_HOME_POS_MM      -108.0  // Offset from button to home pos
 #define FEEDER_HOME_POS_MM      5
 #define FEEDER_HOME_POS_STEPS   FEEDER_HOME_POS_MM / FEEDER_PITCH_MM * 200.0
 #define SPOOL_WIDTH_MM          60
@@ -113,7 +112,7 @@ int control::powerFans(int fans_on)
 void control::setParams(Parameter params[])
 {
     tensioner.setSpeed(params[0].value * TENS_MICROSTEPS);
-    // params[1].value = spoolerControl(params[1].value);
+    params[1].value = spoolerControl(params[1].value);
     spooler.setSpeed(params[1].value * SPOOL_MICROSTEPS);
     params[2].value = powerFans(params[2].value);
     params[3].value = feederControl(params[1].value);
@@ -140,23 +139,20 @@ int control::feederControl(int spooler_speed)
 
 int control::spoolerControl(int spooler_speed)
 {
-    if ((millis() - spooler_control_time) > SPOOLER_CONTROL_DELAY_MS)
-    // Only update after delay since last speed update.
-    spooler_arm_pos = analogRead(Spooling_Pot);
-
-        if (spooler_arm_pos > 800) {
+    if ((millis() - spooler_control_time) > SPOOLER_CONTROL_DELAY_MS) 
+    {
+        // Only update after control delay since last speed update.
+        if (analogRead(Spooling_Pot) > 225) {
             // Slow down
             spooler_speed -= 1;
             spooler_control_time = millis();
         }
-        else if (spooler_arm_pos < 300) {
+        else if (analogRead(Spooling_Pot) < 175) {
             // Speed up
             spooler_speed += 1;
             spooler_control_time = millis();
         }
+    }
 
-    Serial.println(spooler_arm_pos);
-    // Serial.print("\t");
-    // Serial.println(spooler_speed);
     return spooler_speed;
 }

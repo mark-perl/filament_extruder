@@ -8,9 +8,9 @@ userInterface UI;
 control Control;
 measurement Meas;
 
-Parameter tens_speed(150, "Tensioner Speed", "steps/s", 0);
+Parameter tens_speed(200, "Tensioner Speed", "steps/s", 0);
 Parameter feeder_speed(0, "Feeder Speed", "steps/s", 0);
-Parameter spool_speed(150, "Spooler Speed", "steps/s", 0);
+Parameter spool_speed(200, "Spooler Speed", "steps/s", 0);
 Parameter fans_on(5, "Fans On", "/5", 0);
 
 Parameter meas_diam(0, "Meas. Diam.", "mm", 2);
@@ -81,18 +81,16 @@ void loop(){
         }
     }
     
-    // if ((millis()-lastMillisMeas) > 1000) 
-    // {
-    // lastMillisMeas = millis();
+    if ((millis()-lastMillisMeas) > 1000) 
+    {
+        lastMillisMeas = millis();
 
-    //     // if (meas_diam.value != Meas.readCaliper()) {
-    //         meas_diam.value = Meas.readCaliper();
-    //         if (UI.mode != OFF) {
-    //             UI.updateMeasDiameter(meas_diam);
-    //             Serial.println(meas_diam.value);
-    //         }
-    //     // }
-    // }
+        meas_diam.value = Meas.readCaliper();
+        if (UI.mode != OFF) {
+            UI.updateMeasDiameter(meas_diam);
+            Serial.println(meas_diam.value);
+        }
+    }
     
 
     switch (UI.mode)

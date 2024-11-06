@@ -8,6 +8,18 @@ volatile bool userInterface::enterPressed = false;
 volatile int userInterface::dialValue = 0;
 unsigned long userInterface::buttonPressedMillis = 0;
 
+byte diamSymbol[8] = {
+  0b00001,
+  0b01110,
+  0b10011,
+  // 0b10101,
+  0b10101,
+  0b11001,
+  0b01110,
+  0b10000,
+  0b00000
+};
+
 userInterface::userInterface()
 { 
     pinMode(SW_Select, INPUT);
@@ -38,6 +50,9 @@ void userInterface::displayInit()
     display.print("Setup:");
     display.setCursor(3,3);
     display.print("Please Wait...");
+
+    display.createChar(0, diamSymbol);
+
 }
 
 void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
@@ -46,10 +61,16 @@ void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
         updateDisplay = false;
 
         display.clear();
+        display.home();
+        if (mode==AUTO){display.print("AUTO");}
+        if (mode==MANUAL){display.print("MANUAL");}
 
-        display.setCursor(0,0);
-        display.print(meas_diam.name + ": ");
+        display.setCursor(11,0);
+        // display.print(meas_diam.name + ": ");
+        display.write(0);
+        display.print(": ");
         updateMeasDiameter(meas_diam);
+        display.print(meas_diam.units);
 
         for (int i = 0; i < 3; i++) {
             display.setCursor(0,i+1);
@@ -72,9 +93,16 @@ void userInterface::offDisplay()
 
 void userInterface::updateMeasDiameter(Parameter meas_diam)
 {
-    display.setCursor(13,0);    // Always location of diam.
-    display.print(intToString(meas_diam.value, meas_diam.divisor));
-    display.print(meas_diam.units);
+    display.setCursor(14,0);    // Always location of diam.
+
+    valueString = intToString(meas_diam.value, meas_diam.divisor);
+    // Only allow 'x.xx' length results
+    if (valueString.length() != 4) {
+        display.print("ERR ");
+    }
+    else {
+        display.print(intToString(meas_diam.value, meas_diam.divisor));
+    }
 }
 
 
@@ -164,7 +192,7 @@ String userInterface::intToString(int value, int divisor)
         if (stringLen <= divisor) {
             // Add leading 0s
             for (int i = 0; i < (divisor + 1 - stringLen); i++) {
-                valueString.concat("0");
+                valueString = "0" + valueString;
             }
             stringLen = valueString.length();
         }

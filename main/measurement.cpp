@@ -14,6 +14,7 @@ measurement::~measurement()
 
 float measurement::readCaliper() 
 {
+  // TODO: Make more efficient or non-blocking
   sign = 1;
   value = 0;
 

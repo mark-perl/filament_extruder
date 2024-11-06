@@ -15,6 +15,7 @@ public:
     void setParams(Parameter params[]);
     void moveMotors();
     int powerFans(int fans_on);
+    void autoControl(Parameter param[], Parameter meas_diam);
 
 
 private:

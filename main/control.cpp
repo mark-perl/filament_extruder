@@ -109,12 +109,20 @@ int control::powerFans(int fans_on)
     return fans_on;
 }
 
+void control::autoControl(Parameter params[], Parameter meas_diam)
+{
+    // params[0].value = tensionerControl(params[0].value, meas_diam.value);
+    params[1].value = spoolerControl(params[1].value);
+}
+
 void control::setParams(Parameter params[])
 {
     tensioner.setSpeed(params[0].value * TENS_MICROSTEPS);
-    params[1].value = spoolerControl(params[1].value);
+    
     spooler.setSpeed(params[1].value * SPOOL_MICROSTEPS);
+    
     params[2].value = powerFans(params[2].value);
+
     params[3].value = feederControl(params[1].value);
     feeder.setSpeed(params[3].value * FEEDER_MICROSTEPS);
 }

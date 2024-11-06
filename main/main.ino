@@ -72,6 +72,7 @@ void loop(){
             UI.enterPressed = false;
             UI.displayMode = OVERVIEW;
             UI.updateDisplay = true;
+            i--;
         }
 
         if (UI.mode != UI.readMode()) {
@@ -83,6 +84,7 @@ void loop(){
     
     if ((millis()-lastMillisMeas) > 1000) 
     {
+        // Only update every 1000ms
         lastMillisMeas = millis();
 
         meas_diam.value = Meas.readCaliper();
@@ -109,14 +111,9 @@ void loop(){
             UI.overviewDisplay(autoParams, meas_diam);
         }
 
-        // TODO: Update parameter from control system
-
-        // Serial.println(Meas.readCaliper());
-
+        Control.autoControl(autoParams, meas_diam);
         Control.setParams(autoParams);
         Control.moveMotors();
-
-        
 
         break;
 

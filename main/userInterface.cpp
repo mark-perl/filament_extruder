@@ -62,12 +62,13 @@ void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
 
         display.clear();
         display.home();
+        
         if (mode==AUTO){display.print("AUTO");}
         if (mode==MANUAL){display.print("MANUAL");}
 
         display.setCursor(11,0);
         // display.print(meas_diam.name + ": ");
-        display.write(0);
+        display.write(0);   // diameter symbol
         display.print(": ");
         updateMeasDiameter(meas_diam);
         display.print(meas_diam.units);

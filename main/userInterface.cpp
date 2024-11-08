@@ -12,7 +12,6 @@ byte diamSymbol[8] = {
   0b00001,
   0b01110,
   0b10011,
-  // 0b10101,
   0b10101,
   0b11001,
   0b01110,
@@ -46,8 +45,10 @@ void userInterface::displayInit()
     display.clear();
     display.setCursor(0,0);
     display.print("Filament Extruder");
-    display.setCursor(0,1);
-    display.print("Setup:");
+    // display.setCursor(0,1);
+    // display.print("Setup:");
+    display.setCursor(0,2);
+    display.print("Feeder Homing");
     display.setCursor(3,3);
     display.print("Please Wait...");
 
@@ -62,7 +63,7 @@ void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
 
         display.clear();
         display.home();
-        
+
         if (mode==AUTO){display.print("AUTO");}
         if (mode==MANUAL){display.print("MANUAL");}
 
@@ -76,7 +77,7 @@ void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
         for (int i = 0; i < 3; i++) {
             display.setCursor(0,i+1);
             display.print(params[i].name + ": ");
-            display.print(intToString(params[i].value, params[i].divisor));
+            display.print(intToString(params[i].value, params[i].scaler));
         }
     }
 }
@@ -96,13 +97,13 @@ void userInterface::updateMeasDiameter(Parameter meas_diam)
 {
     display.setCursor(14,0);    // Always location of diam.
 
-    valueString = intToString(meas_diam.value, meas_diam.divisor);
+    valueString = intToString(meas_diam.value, meas_diam.scaler);
     // Only allow 'x.xx' length results
     if (valueString.length() != 4) {
         display.print("ERR ");
     }
     else {
-        display.print(intToString(meas_diam.value, meas_diam.divisor));
+        display.print(intToString(meas_diam.value, meas_diam.scaler));
     }
 }
 
@@ -121,7 +122,7 @@ Parameter userInterface::updateParameter(Parameter param)
         display.print(param.name);
 
         display.setCursor(0,3);
-        display.print(intToString(param.value, param.divisor));
+        display.print(intToString(param.value, param.scaler));
         display.print(" " + param.units);
     }
 
@@ -130,7 +131,7 @@ Parameter userInterface::updateParameter(Parameter param)
         updateDisplayValue = false;
 
         display.setCursor(0,3);
-        display.print(intToString(param.value, param.divisor));
+        display.print(intToString(param.value, param.scaler));
         display.print(" " + param.units + "  ");
     }
 
@@ -180,26 +181,32 @@ int userInterface::readMode()
     }
 }
 
-String userInterface::intToString(int value, int divisor)
+String userInterface::intToString(int value, int scaler)
 {
     valueString = String(value);
+    stringLen = valueString.length();
 
-    if (divisor == 0) {
+    if (scaler == 0) {
         return valueString;
     }
-    else {
-        stringLen = valueString.length();
-
-        if (stringLen <= divisor) {
+    else if (scaler < 0) {
+        // Add decimal place
+        if (stringLen <= -scaler) {
             // Add leading 0s
-            for (int i = 0; i < (divisor + 1 - stringLen); i++) {
+            for (int i = 0; i < (-scaler + 1 - stringLen); i++) {
                 valueString = "0" + valueString;
             }
             stringLen = valueString.length();
         }
-
-        decimalLoc = valueString.length() - divisor;
+        decimalLoc = valueString.length() + scaler;
         return valueString.substring(0,decimalLoc) + '.' + valueString.substring(decimalLoc, stringLen);
+    }
+    else {
+        // Add trailing 0s
+        for (int i = 0; i < (scaler + 1 - stringLen); i++) {
+            valueString.concat("0");
+        }
+        return valueString;
     }
 }
 

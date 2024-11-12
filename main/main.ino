@@ -4,6 +4,8 @@
 #include "parameters.h"
 #include "measurement.h"
 
+#define LOG_DATA true
+
 userInterface UI;
 control Control;
 measurement Meas;
@@ -32,7 +34,7 @@ Parameter manualParams[4] = {
 
 int i = 0;
 unsigned long lastMillis = 0;
-unsigned long lastMillisMeas = 0;
+unsigned long lastMillisLong = 0;
 
 
 void setup(){
@@ -83,16 +85,34 @@ void loop(){
             // if (UI.mode != OFF){
             //     Control.motorsOn();
             // }
-        }
+        }   
+    }
+
+    
+    if ((millis() - lastMillisLong) > 1000) {
+        lastMillisLong = millis();
 
         if (UI.mode != OFF) { 
             if (meas_diam.value != Meas.caliperValue) {
                 meas_diam.value = Meas.caliperValue;
                 UI.updateMeasDiameter(meas_diam);
-                Serial.println(meas_diam.value);
+                // Serial.println(meas_diam.value);
             }
         }
+
+        if (LOG_DATA) {
+            Serial.print(autoParams[0].value);
+            Serial.print(",");
+            Serial.print(autoParams[1].value);
+            Serial.print(",");
+            Serial.print(meas_diam.value);
+            Serial.print(",\t");
+            Serial.println(String(meas_diam.value, BIN));
+            // Serial.write((uint8_t*)&meas_diam.value, sizeof(meas_diam.value));
+            // Serial.print("\n");
+        }
     }
+
     
 
     switch (UI.mode)

@@ -8,16 +8,20 @@ public:
     measurement();
     ~measurement();
     
+    static void caliperInterrupt();
+
+    void caliperInit();
     float readCaliper();
     void zeroCaliper();
 
+    static volatile int caliperValue;
+
 private:
 
-    char buf[20];
-    unsigned long tmpTime;
-    int sign;
-    long value;
-    // float result = 0;
-    float offset = 0; 
-   
+    static volatile int sign;
+    static volatile int value;
+    static volatile unsigned long interruptTime;
+    static volatile int i;
+    static volatile float zeroOffset; 
+    
 };

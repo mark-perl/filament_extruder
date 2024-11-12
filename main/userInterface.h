@@ -39,6 +39,7 @@ public:
     int displayMode = OVERVIEW;
 
     bool updateDisplay = true;
+    int lastControlMode = OFF;
 
 private:
     String intToString(int value, int dp);

@@ -70,8 +70,6 @@ void measurement::caliperInterrupt()
 
 float measurement::readCaliper()
 {   
-    // Unused function.
-
     // Blocking method to read caliper value
     // Time taken between 6-70ms, depending on when called
 
@@ -93,18 +91,21 @@ float measurement::readCaliper()
         // Read the data bit
         if (digitalRead(Meas_Data) == HIGH)
         {
-            if (i < 20)
-                value |= (1 << i); // Build the value from bits 0-19
-            if (i == 20)
+            if ((i < 20) && (i > 0))
+                value |= (1 << (i-1)); // Build the value from bits 0-19
+            if (i == 21)
+                // value <= 1;  // Right shift by 1
                 sign = -1; // Set the sign bit
         }
     }
 
     // Convert the raw value to a measurement in millimeters *10^-2
-    return (value * sign) - zeroOffset;
+    caliperValue = (value * sign) - zeroOffset;
+    return caliperValue;
 }
 
 void measurement::zeroCaliper()
 {
+    readCaliper();
     zeroOffset = caliperValue; // Set the offset to the current value to zero out future measurements
 }

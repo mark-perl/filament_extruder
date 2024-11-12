@@ -43,8 +43,8 @@ void setup(){
     UI.displayInit();
     Control.motorsInit();
 
-    // Meas.zeroCaliper();
-    Meas.caliperInit();
+    Meas.zeroCaliper();
+    // Meas.caliperInit();
     
     Control.powerFans(0);
     Control.feederHome();
@@ -93,6 +93,7 @@ void loop(){
         lastMillisLong = millis();
 
         if (UI.mode != OFF) { 
+            Meas.readCaliper();
             if (meas_diam.value != Meas.caliperValue) {
                 meas_diam.value = Meas.caliperValue;
                 UI.updateMeasDiameter(meas_diam);
@@ -106,10 +107,9 @@ void loop(){
             Serial.print(autoParams[1].value);
             Serial.print(",");
             Serial.print(meas_diam.value);
-            Serial.print(",\t");
-            Serial.println(String(meas_diam.value, BIN));
-            // Serial.write((uint8_t*)&meas_diam.value, sizeof(meas_diam.value));
-            // Serial.print("\n");
+            // Serial.print(",\t");
+            // Serial.println(String(meas_diam.value, BIN));
+            Serial.println();
         }
     }
 
@@ -125,10 +125,18 @@ void loop(){
         break;
     
     case AUTO:
-        if (UI.displayMode == EDIT){
+        if (UI.lastControlMode != AUTO) {
+            UI.lastControlMode = AUTO;
+            // If mode changed, reset params to manual params
+            for (int i = 0; i < 4; i++) {
+                autoParams[i].value = manualParams[i].value;
+            }
+        }
+
+        if (UI.displayMode == EDIT) {
             goal_diam = UI.updateParameter(goal_diam);
         }
-        if (UI.displayMode == OVERVIEW){
+        if (UI.displayMode == OVERVIEW) {
             UI.overviewDisplay(autoParams, meas_diam);
         }
 
@@ -139,12 +147,19 @@ void loop(){
         break;
 
     case MANUAL:
+        if (UI.lastControlMode != MANUAL) {
+            UI.lastControlMode = MANUAL;
+            // If mode changed, reset params to auto params
+            for (int i = 0; i < 4; i++) {
+                manualParams[i].value = autoParams[i].value;
+            }
+        }
+
         if (UI.displayMode == EDIT){
             manualParams[i] = UI.updateParameter(manualParams[i]);
         }
         if (UI.displayMode == OVERVIEW){
             UI.overviewDisplay(manualParams, meas_diam);
-
         }
 
         Control.setParams(manualParams);

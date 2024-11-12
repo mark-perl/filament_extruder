@@ -6,7 +6,7 @@ AccelStepper feeder    (1, M2_Step, M2_Dir);
 AccelStepper spooler   (1, M3_Step, M3_Dir);
 
 #define TENS_MICROSTEPS     -8
-#define SPOOL_MICROSTEPS    8
+#define SPOOL_MICROSTEPS    2
 #define FEEDER_MICROSTEPS   8
 
 #define FANS_CONTROLLED     3
@@ -17,7 +17,7 @@ AccelStepper spooler   (1, M3_Step, M3_Dir);
 #define FEEDER_HOME_POS_STEPS   FEEDER_HOME_POS_MM / FEEDER_PITCH_MM * 200.0
 #define SPOOL_WIDTH_MM          60
 #define FEEDER_END_POS_STEPS    FEEDER_HOME_POS_STEPS + SPOOL_WIDTH_MM / FEEDER_PITCH_MM * 200.0
-#define FEEDER_SPOOLER_RATIO    16.0
+#define FEEDER_SPOOLER_RATIO    8
 
 #define SPOOLER_CONTROL_DELAY_MS    500
 #define TENSIONER_CONTROL_DELAY_MS  500
@@ -47,9 +47,9 @@ control::~control()
 
 void control::motorsInit()
 {
-    tensioner.setMaxSpeed(400 * TENS_MICROSTEPS);
-    feeder.setMaxSpeed(400 * FEEDER_MICROSTEPS);
-    spooler.setMaxSpeed(400 * SPOOL_MICROSTEPS);
+    tensioner.setMaxSpeed(1000 * TENS_MICROSTEPS);
+    feeder.setMaxSpeed(1000 * FEEDER_MICROSTEPS);
+    spooler.setMaxSpeed(1000 * SPOOL_MICROSTEPS);
     feeder.setAcceleration(100000); // large for no accel
 
     // Timer1.initialize(100);
@@ -141,7 +141,7 @@ int control::powerFans(int fans_on)
 
 void control::autoControl(Parameter params[], Parameter meas_diam, Parameter goal_diam)
 {
-    params[0].value = tensionerControl(params[0].value, (goal_diam.value - meas_diam.value));
+    params[0].value = tensionerControl(params[0].value, (meas_diam.value - goal_diam.value));
     params[1].value = spoolerControl(params[1].value);
 }
 
@@ -193,12 +193,12 @@ int control::tensionerControl(int tensioner_speed, int diam_error)
     if ((millis() - tensioner_control_time) > TENSIONER_CONTROL_DELAY_MS) 
     {
         // Only update after control delay since last speed update.
-        if (diam_error < -2) {
+        if (diam_error < -4) {
             // Slow down
             tensioner_speed -= 1;
             tensioner_control_time = millis();
         }
-        else if (diam_error > 2) {
+        else if (diam_error > 4) {
             // Speed up
             tensioner_speed += 1;
             tensioner_control_time = millis();

@@ -51,8 +51,10 @@ void measurement::caliperInterrupt()
 {
     // Interuppt on low clock value
 
-    value |= (digitalRead(Meas_Data) << i) * (i < 20);  // Accumulate bits only for i < 20
-
+    // value |= (digitalRead(Meas_Data) << i) * (i < 20);  // Accumulate bits only for i < 20
+    if (digitalRead(Meas_Data)) {
+        value |= (1 << i-1) * (i < 20);
+    }
     if (i == 20) {
         sign = signTable[digitalRead(Meas_Data)];  // Assign sign value
         caliperValue = (value * sign) - zeroOffset; 

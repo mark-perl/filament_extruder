@@ -45,60 +45,31 @@ void measurement::caliperInit()
 
     delay(200); // Wait for caliper to read value
     zeroCaliper();
-
-    Serial.println("Init done");
 }
 
 void measurement::caliperInterrupt()
 {
     // Interuppt on low clock value
 
-    // if (!digitalRead(Meas_Clock))
-    // {   
-        // Serial.println("low interrrupt");
-        // if (digitalRead(Meas_Data) == HIGH)
-        // {
-        //     if (i < 20) {
-        //         value |= (digitalRead(Meas_Data) << i); // Build the value from bits 0-19  
-        //     }
-        //     else if (i == 20) {
-        //         // sign = -1; // Set the sign bit
-        //         sign = (digitalRead(Meas_Data)) ? -1 : 1;
-                
-        //         // Update caliper value
-        //         caliperValue = (value * sign);// - zeroOffset;
-        //     }
-        //     else if (i==24) {
-        //         // Reset for next packet
-        //         i = -1;
-        //         value = 0;
-        //         sign = 1;
-        //         // Serial.println("done packet");
-        //         // Serial.println(caliperValue);
-        //     }
-        // // }
-        // i++;
-    // }
+    value |= (digitalRead(Meas_Data) << i) * (i < 20);  // Accumulate bits only for i < 20
 
-        value |= (digitalRead(Meas_Data) << i) * (i < 20);  // Accumulate bits only for i < 20
+    if (i == 20) {
+        sign = signTable[digitalRead(Meas_Data)];  // Assign sign value
+        caliperValue = (value * sign) - zeroOffset; 
+    } 
+    else if (i == 23) {
+        i = -1;       // Reset index for next packet
+        value = 0;    // Reset accumulated value
+        // sign = 1;     // Reset sign
+    }
 
-        if (i == 20) {
-            sign = signTable[digitalRead(Meas_Data)];  // Assign sign value
-            caliperValue = (value * sign) - zeroOffset; 
-        } 
-        else if (i == 23) {
-            i = -1;       // Reset index for next packet
-            value = 0;    // Reset accumulated value
-            // sign = 1;     // Reset sign
-        }
-
-        i++;
+    i++;
 }
 
 float measurement::readCaliper()
 {   
     // Unused function.
-    
+
     // Blocking method to read caliper value
     // Time taken between 6-70ms, depending on when called
 

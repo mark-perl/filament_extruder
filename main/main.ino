@@ -89,24 +89,10 @@ void loop(){
             if (meas_diam.value != Meas.caliperValue) {
                 meas_diam.value = Meas.caliperValue;
                 UI.updateMeasDiameter(meas_diam);
+                Serial.println(meas_diam.value);
             }
         }
     }
-    
-    // if ((millis()-lastMillisMeas) > 1000) 
-    // {
-    //     // Only update every 1000ms
-    //     lastMillisMeas = millis();
-    //     // UI.updateDisplay = true;
-
-    //     meas_diam.value = Meas.caliperValue;
-    //     if (UI.mode != OFF) {
-    //         UI.updateMeasDiameter(meas_diam);
-    //         // Serial.print(Meas.readCaliper());
-    //         // Serial.print("\t");
-    //         Serial.println(meas_diam.value);
-    //     }
-    // }
     
 
     switch (UI.mode)
@@ -126,7 +112,7 @@ void loop(){
             UI.overviewDisplay(autoParams, meas_diam);
         }
 
-        Control.autoControl(autoParams, meas_diam);
+        Control.autoControl(autoParams, meas_diam, goal_diam);
         Control.setParams(autoParams);
         Control.moveMotors();
 

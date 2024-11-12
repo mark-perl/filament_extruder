@@ -18,19 +18,19 @@ Parameter fans_on(5, "Fans On", "/5", 0);
 Parameter meas_diam(0, "Meas. Diam.", "mm", -2);
 Parameter goal_diam(175, "Goal Diameter", "mm", -2);
 
-Parameter autoParams[4] = {
+Parameter params[4] = {
     tens_speed,      // 0
     spool_speed,     // 1
     fans_on,         // 2
     feeder_speed,    // 3
 };
 
-Parameter manualParams[4] = {
-    tens_speed,      // 0
-    spool_speed,     // 1
-    fans_on,         // 2
-    feeder_speed,    // 3
-};
+// Parameter autoParams[4] = {
+//     tens_speed,      // 0
+//     spool_speed,     // 1
+//     fans_on,         // 2
+//     feeder_speed,    // 3
+// };
 
 int i = 0;
 unsigned long lastMillis = 0;
@@ -43,8 +43,8 @@ void setup(){
     UI.displayInit();
     Control.motorsInit();
 
-    Meas.zeroCaliper();
-    // Meas.caliperInit();
+    // Meas.zeroCaliper();
+    Meas.caliperInit();
     
     Control.powerFans(0);
     Control.feederHome();
@@ -93,7 +93,7 @@ void loop(){
         lastMillisLong = millis();
 
         if (UI.mode != OFF) { 
-            Meas.readCaliper();
+            // Meas.readCaliper();
             if (meas_diam.value != Meas.caliperValue) {
                 meas_diam.value = Meas.caliperValue;
                 UI.updateMeasDiameter(meas_diam);
@@ -102,9 +102,9 @@ void loop(){
         }
 
         if (LOG_DATA) {
-            Serial.print(autoParams[0].value);
+            Serial.print(params[0].value);
             Serial.print(",");
-            Serial.print(autoParams[1].value);
+            Serial.print(params[1].value);
             Serial.print(",");
             Serial.print(meas_diam.value);
             // Serial.print(",\t");
@@ -125,44 +125,45 @@ void loop(){
         break;
     
     case AUTO:
-        if (UI.lastControlMode != AUTO) {
-            UI.lastControlMode = AUTO;
-            // If mode changed, reset params to manual params
-            for (int i = 0; i < 4; i++) {
-                autoParams[i].value = manualParams[i].value;
-            }
-        }
+        // if (UI.lastControlMode != AUTO) {
+        //     UI.lastControlMode = AUTO;
+        //     // If mode changed, reset params to manual params
+        //     for (int i = 0; i < 4; i++) {
+        //         params[i].value = params[i].value;
+        //     }
+        // }
 
         if (UI.displayMode == EDIT) {
             goal_diam = UI.updateParameter(goal_diam);
         }
         if (UI.displayMode == OVERVIEW) {
-            UI.overviewDisplay(autoParams, meas_diam);
+            UI.overviewDisplay(params, meas_diam);
         }
 
-        Control.autoControl(autoParams, meas_diam, goal_diam);
-        Control.setParams(autoParams);
+        Control.autoControl(params, meas_diam, goal_diam);
+        
+        Control.setParams(params);
         Control.moveMotors();
 
         break;
 
     case MANUAL:
-        if (UI.lastControlMode != MANUAL) {
-            UI.lastControlMode = MANUAL;
-            // If mode changed, reset params to auto params
-            for (int i = 0; i < 4; i++) {
-                manualParams[i].value = autoParams[i].value;
-            }
-        }
+        // if (UI.lastControlMode != MANUAL) {
+        //     UI.lastControlMode = MANUAL;
+        //     // If mode changed, reset params to auto params
+        //     for (int i = 0; i < 4; i++) {
+        //         params[i].value = params[i].value;
+        //     }
+        // }
 
         if (UI.displayMode == EDIT){
-            manualParams[i] = UI.updateParameter(manualParams[i]);
+            params[i] = UI.updateParameter(params[i]);
         }
         if (UI.displayMode == OVERVIEW){
-            UI.overviewDisplay(manualParams, meas_diam);
+            UI.overviewDisplay(params, meas_diam);
         }
 
-        Control.setParams(manualParams);
+        Control.setParams(params);
         Control.moveMotors();
 
         break;

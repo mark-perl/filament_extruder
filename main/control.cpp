@@ -19,8 +19,10 @@ AccelStepper spooler   (1, M3_Step, M3_Dir);
 #define FEEDER_END_POS_STEPS    FEEDER_HOME_POS_STEPS + SPOOL_WIDTH_MM / FEEDER_PITCH_MM * 200.0
 #define FEEDER_SPOOLER_RATIO    8
 
-#define SPOOLER_CONTROL_DELAY_MS    500
-#define TENSIONER_CONTROL_DELAY_MS  500
+#define SPOOLER_CONTROL_DELAY_MS    250
+#define TENSIONER_CONTROL_DELAY_MS  1000
+
+#define TENSIONER_CONTROL_GAIN      0.2
 
 
 control::control()
@@ -175,7 +177,7 @@ int control::spoolerControl(int spooler_speed)
         // Only update after control delay since last speed update.
         if (analogRead(Spooling_Pot) > 225) {
             // Slow down
-            spooler_speed -= 1;
+            spooler_speed -= 2;
             spooler_control_time = millis();
         }
         else if (analogRead(Spooling_Pot) < 175) {
@@ -193,16 +195,19 @@ int control::tensionerControl(int tensioner_speed, int diam_error)
     if ((millis() - tensioner_control_time) > TENSIONER_CONTROL_DELAY_MS) 
     {
         // Only update after control delay since last speed update.
-        if (diam_error < -4) {
+        if (diam_error < -3) {
             // Slow down
             tensioner_speed -= 1;
             tensioner_control_time = millis();
         }
-        else if (diam_error > 4) {
+        else if (diam_error > 3) {
             // Speed up
             tensioner_speed += 1;
             tensioner_control_time = millis();
         }
+
+        // tensioner_control_time = millis();
+        // tensioner_speed += diam_error * TENSIONER_CONTROL_GAIN;
     }
 
     return tensioner_speed;

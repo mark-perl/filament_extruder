@@ -53,7 +53,7 @@ void measurement::caliperInterrupt()
 
     // value |= (digitalRead(Meas_Data) << i) * (i < 20);  // Accumulate bits only for i < 20
     if (digitalRead(Meas_Data)) {
-        value |= (1 << i-1) * (i < 20);
+        value |= (1 << (i-1)) * (i < 20) * (i != 0);
     }
     if (i == 20) {
         sign = signTable[digitalRead(Meas_Data)];  // Assign sign value

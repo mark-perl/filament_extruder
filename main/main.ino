@@ -13,15 +13,14 @@ Parameter feeder_speed(0, "Feeder Speed", "steps/s", 0);
 Parameter spool_speed(200, "Spooler Speed", "steps/s", 0);
 Parameter fans_on(5, "Fans On", "/5", 0);
 
-Parameter meas_diam(0, "Meas. Diam.", "mm", 2);
-Parameter goal_diam(175, "Goal Diameter", "mm", 2);
+Parameter meas_diam(0, "Meas. Diam.", "mm", -2);
+Parameter goal_diam(175, "Goal Diameter", "mm", -2);
 
 Parameter autoParams[4] = {
     tens_speed,      // 0
     spool_speed,     // 1
     fans_on,         // 2
     feeder_speed,    // 3
-
 };
 
 Parameter manualParams[4] = {
@@ -42,9 +41,11 @@ void setup(){
     UI.displayInit();
     Control.motorsInit();
 
+    // Meas.zeroCaliper();
+    Meas.caliperInit();
+    
     Control.powerFans(0);
     Control.feederHome();
-    // Meas.zeroCaliper();
 
     UI.updateDisplay = true;
 }
@@ -79,26 +80,40 @@ void loop(){
             UI.mode = UI.readMode();
             UI.updateDisplay = true;
             UI.displayMode = OVERVIEW;
+            // if (UI.mode != OFF){
+            //     Control.motorsOn();
+            // }
+        }
+
+        if (UI.mode != OFF) { 
+            if (meas_diam.value != Meas.caliperValue) {
+                meas_diam.value = Meas.caliperValue;
+                UI.updateMeasDiameter(meas_diam);
+            }
         }
     }
     
-    if ((millis()-lastMillisMeas) > 1000) 
-    {
-        // Only update every 1000ms
-        lastMillisMeas = millis();
+    // if ((millis()-lastMillisMeas) > 1000) 
+    // {
+    //     // Only update every 1000ms
+    //     lastMillisMeas = millis();
+    //     // UI.updateDisplay = true;
 
-        meas_diam.value = Meas.readCaliper();
-        if (UI.mode != OFF) {
-            UI.updateMeasDiameter(meas_diam);
-            Serial.println(meas_diam.value);
-        }
-    }
+    //     meas_diam.value = Meas.caliperValue;
+    //     if (UI.mode != OFF) {
+    //         UI.updateMeasDiameter(meas_diam);
+    //         // Serial.print(Meas.readCaliper());
+    //         // Serial.print("\t");
+    //         Serial.println(meas_diam.value);
+    //     }
+    // }
     
 
     switch (UI.mode)
     {
     case OFF:
         Control.powerFans(0);   // Turn fans off
+        // Control.motorsOff();
         UI.offDisplay();
         // Don't move motors
         break;
@@ -128,6 +143,7 @@ void loop(){
 
         Control.setParams(manualParams);
         Control.moveMotors();
+
         break;
 
     default:

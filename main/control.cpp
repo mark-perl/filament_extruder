@@ -20,6 +20,7 @@ AccelStepper spooler   (1, M3_Step, M3_Dir);
 #define FEEDER_SPOOLER_RATIO    16.0
 
 #define SPOOLER_CONTROL_DELAY_MS    500
+#define TENSIONER_CONTROL_DELAY_MS  500
 
 
 control::control()
@@ -50,6 +51,35 @@ void control::motorsInit()
     feeder.setMaxSpeed(400 * FEEDER_MICROSTEPS);
     spooler.setMaxSpeed(400 * SPOOL_MICROSTEPS);
     feeder.setAcceleration(100000); // large for no accel
+
+    // Timer1.initialize(100);
+    // motorsOn();
+    // ITimer1.init();
+    
+}
+
+void moveMotorsInterrupt()
+{
+    tensioner.runSpeed();
+    feeder.runSpeed();
+    spooler.runSpeed();
+}
+
+void control::motorsOn()
+{
+    // Timer1.attachInterrupt(moveMotorsInterrupt);
+}
+
+void control::motorsOff()
+{
+    // Timer1.detachInterrupt();
+}
+
+void control::moveMotors()
+{
+    tensioner.runSpeed();
+    feeder.runSpeed();
+    spooler.runSpeed();
 }
 
 void control::feederHome()
@@ -109,9 +139,9 @@ int control::powerFans(int fans_on)
     return fans_on;
 }
 
-void control::autoControl(Parameter params[], Parameter meas_diam)
+void control::autoControl(Parameter params[], Parameter meas_diam, Parameter goal_diam)
 {
-    // params[0].value = tensionerControl(params[0].value, meas_diam.value);
+    params[0].value = tensionerControl(params[0].value, (goal_diam.value - meas_diam.value));
     params[1].value = spoolerControl(params[1].value);
 }
 
@@ -125,13 +155,6 @@ void control::setParams(Parameter params[])
 
     params[3].value = feederControl(params[1].value);
     feeder.setSpeed(params[3].value * FEEDER_MICROSTEPS);
-}
-
-void control::moveMotors()
-{
-    tensioner.runSpeed();
-    feeder.runSpeed();
-    spooler.runSpeed();
 }
 
 int control::feederControl(int spooler_speed)
@@ -163,4 +186,24 @@ int control::spoolerControl(int spooler_speed)
     }
 
     return spooler_speed;
+}
+
+int control::tensionerControl(int tensioner_speed, int diam_error)
+{
+    if ((millis() - tensioner_control_time) > TENSIONER_CONTROL_DELAY_MS) 
+    {
+        // Only update after control delay since last speed update.
+        if (diam_error < -2) {
+            // Slow down
+            tensioner_speed -= 1;
+            tensioner_control_time = millis();
+        }
+        else if (diam_error > 2) {
+            // Speed up
+            tensioner_speed += 1;
+            tensioner_control_time = millis();
+        }
+    }
+
+    return tensioner_speed;
 }

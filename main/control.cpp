@@ -6,7 +6,7 @@ AccelStepper feeder    (1, M2_Step, M2_Dir);
 AccelStepper spooler   (1, M3_Step, M3_Dir);
 
 #define TENS_MICROSTEPS     -8
-#define SPOOL_MICROSTEPS    2
+#define SPOOL_MICROSTEPS    8
 #define FEEDER_MICROSTEPS   8
 
 #define FANS_CONTROLLED     3
@@ -17,12 +17,10 @@ AccelStepper spooler   (1, M3_Step, M3_Dir);
 #define FEEDER_HOME_POS_STEPS   FEEDER_HOME_POS_MM / FEEDER_PITCH_MM * 200.0
 #define SPOOL_WIDTH_MM          60
 #define FEEDER_END_POS_STEPS    FEEDER_HOME_POS_STEPS + SPOOL_WIDTH_MM / FEEDER_PITCH_MM * 200.0
-#define FEEDER_SPOOLER_RATIO    8
+#define FEEDER_SPOOLER_RATIO    24
 
 #define SPOOLER_CONTROL_DELAY_MS    250
 #define TENSIONER_CONTROL_DELAY_MS  1000
-
-#define TENSIONER_CONTROL_GAIN      0.2
 
 
 control::control()
@@ -143,8 +141,13 @@ int control::powerFans(int fans_on)
 
 void control::autoControl(Parameter params[], Parameter meas_diam, Parameter goal_diam)
 {
+    // Tensioner as diameter control
     params[0].value = tensionerControl(params[0].value, (meas_diam.value - goal_diam.value));
     params[1].value = spoolerControl(params[1].value);
+
+    // // Spooler as diameter control
+    // params[1].value = tensionerControl(params[1].value, (meas_diam.value - goal_diam.value));
+
 }
 
 void control::setParams(Parameter params[])
@@ -195,19 +198,17 @@ int control::tensionerControl(int tensioner_speed, int diam_error)
     if ((millis() - tensioner_control_time) > TENSIONER_CONTROL_DELAY_MS) 
     {
         // Only update after control delay since last speed update.
-        if (diam_error < -3) {
+
+        if (diam_error < -5) {
             // Slow down
             tensioner_speed -= 1;
             tensioner_control_time = millis();
         }
-        else if (diam_error > 3) {
+        else if (diam_error > 5) {
             // Speed up
             tensioner_speed += 1;
             tensioner_control_time = millis();
         }
-
-        // tensioner_control_time = millis();
-        // tensioner_speed += diam_error * TENSIONER_CONTROL_GAIN;
     }
 
     return tensioner_speed;

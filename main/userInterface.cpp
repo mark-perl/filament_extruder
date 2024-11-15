@@ -59,6 +59,7 @@ void userInterface::displayInit()
 void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
 {
     if (updateDisplay) {
+        updateValues = true;
         updateDisplay = false;
 
         display.clear();
@@ -74,11 +75,31 @@ void userInterface::overviewDisplay(Parameter params[], Parameter meas_diam)
         updateMeasDiameter(meas_diam);
         display.print(meas_diam.units);
 
-        for (int i = 0; i < 3; i++) {
-            display.setCursor(0,i+1);
-            display.print(params[i].name + ": ");
-            display.print(intToString(params[i].value, params[i].scaler));
-        }
+        // for (int i = 0; i < 3; i++) {
+        //     display.setCursor(0,i+1);
+        //     display.print(params[i].name + ": ");
+        //     display.print(intToString(params[i].value, params[i].scaler));
+        // }
+
+        display.setCursor(0,1);
+        display.print("Tensio. Speed: ");
+        display.setCursor(0,2);
+        display.print("Spooler Speed: ");
+        display.setCursor(0,3);
+        display.print("Fans on: ");
+    }
+
+    if (updateValues) {
+        updateValues = false;
+
+        display.setCursor(15,1);
+        display.print(intToString(params[0].value, params[0].scaler));
+        display.print(" ");     // Print blank character after to override possible digit
+        display.setCursor(15,2);
+        display.print(intToString(params[1].value, params[1].scaler));
+        display.print(" ");     // Print blank character after to override possible digit
+        display.setCursor(9,3);
+        display.print(intToString(params[2].value, params[2].scaler));
     }
 }
 

@@ -39,6 +39,7 @@ public:
     int displayMode = OVERVIEW;
 
     bool updateDisplay = true;
+    bool updateValues = true;
     int lastControlMode = OFF;
 
 private:

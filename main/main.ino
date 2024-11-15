@@ -25,13 +25,6 @@ Parameter params[4] = {
     feeder_speed,    // 3
 };
 
-// Parameter autoParams[4] = {
-//     tens_speed,      // 0
-//     spool_speed,     // 1
-//     fans_on,         // 2
-//     feeder_speed,    // 3
-// };
-
 int i = 0;
 unsigned long lastMillis = 0;
 unsigned long lastMillisLong = 0;
@@ -43,8 +36,8 @@ void setup(){
     UI.displayInit();
     Control.motorsInit();
 
-    // Meas.zeroCaliper();
-    Meas.caliperInit();
+    Meas.zeroCaliper();     // Blocking method zero
+    // Meas.caliperInit();     // Interrupt method of reading caliper value
     
     Control.powerFans(0);
     Control.feederHome();
@@ -93,7 +86,7 @@ void loop(){
         lastMillisLong = millis();
 
         if (UI.mode != OFF) { 
-            // Meas.readCaliper();
+            Meas.readCaliper();     // Needed for blocking method of reading caliper
             if (meas_diam.value != Meas.caliperValue) {
                 meas_diam.value = Meas.caliperValue;
                 UI.updateMeasDiameter(meas_diam);
@@ -101,7 +94,16 @@ void loop(){
             }
         }
 
+        if (UI.mode == AUTO) {
+            // Update speed values on display
+            UI.updateValues = true;
+        }
+
         if (LOG_DATA) {
+            if (UI.mode==MANUAL) {Serial.print("MANUAL");}
+            if (UI.mode==AUTO) {Serial.print("AUTO");}
+            if (UI.mode==OFF) {Serial.print("OFF");}
+            Serial.print(",");
             Serial.print(params[0].value);
             Serial.print(",");
             Serial.print(params[1].value);

@@ -4,8 +4,8 @@ import os
 import time
 import csv
 
-
-com = '/dev/cu.usbmodem1101'
+# Set com port
+com = '/dev/cu.usbmodem101'
 
 try:
     nano = serial.Serial(com, 9600)
@@ -27,7 +27,7 @@ time.sleep(5)
 
 file = open(filename, 'a+', newline='')
 csvwriter = csv.writer(file, dialect='excel', delimiter=',')
-header = ["Tensioner Speed", "Spooler Speed", "Measured Diameter"]
+header = ["Mode", "Tensioner Speed", "Spooler Speed", "Measured Diameter"]
 csvwriter.writerow(header)
 print(header)
 

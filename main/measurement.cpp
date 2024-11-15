@@ -55,7 +55,14 @@ void measurement::caliperInterrupt()
     if (digitalRead(Meas_Data)) {
         value |= (1 << (i-1)) * (i < 20) * (i != 0);
     }
-    if (i == 20) {
+
+    if (i == 0) {
+        // First bit should always be low, i think
+        if (!digitalRead(Meas_Data)) {
+            i = 1;  // Assume it missed a bit and iterate to next
+        }
+    }
+    else if (i == 20) {
         sign = signTable[digitalRead(Meas_Data)];  // Assign sign value
         caliperValue = (value * sign) - zeroOffset; 
     } 

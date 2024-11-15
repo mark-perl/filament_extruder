@@ -25,7 +25,7 @@ Parameter params[4] = {
     feeder_speed,    // 3
 };
 
-int i = 0;
+int i = -1;
 unsigned long lastMillis = 0;
 unsigned long lastMillisLong = 0;
 
@@ -36,8 +36,8 @@ void setup(){
     UI.displayInit();
     Control.motorsInit();
 
-    Meas.zeroCaliper();     // Blocking method zero
-    // Meas.caliperInit();     // Interrupt method of reading caliper value
+    // Meas.zeroCaliper();     // Blocking method zero
+    Meas.caliperInit();     // Interrupt method of reading caliper value
     
     Control.powerFans(0);
     Control.feederHome();
@@ -86,7 +86,7 @@ void loop(){
         lastMillisLong = millis();
 
         if (UI.mode != OFF) { 
-            Meas.readCaliper();     // Needed for blocking method of reading caliper
+            // Meas.readCaliper();     // Needed for blocking method of reading caliper
             if (meas_diam.value != Meas.caliperValue) {
                 meas_diam.value = Meas.caliperValue;
                 UI.updateMeasDiameter(meas_diam);
@@ -127,14 +127,6 @@ void loop(){
         break;
     
     case AUTO:
-        // if (UI.lastControlMode != AUTO) {
-        //     UI.lastControlMode = AUTO;
-        //     // If mode changed, reset params to manual params
-        //     for (int i = 0; i < 4; i++) {
-        //         params[i].value = params[i].value;
-        //     }
-        // }
-
         if (UI.displayMode == EDIT) {
             goal_diam = UI.updateParameter(goal_diam);
         }
@@ -150,14 +142,6 @@ void loop(){
         break;
 
     case MANUAL:
-        // if (UI.lastControlMode != MANUAL) {
-        //     UI.lastControlMode = MANUAL;
-        //     // If mode changed, reset params to auto params
-        //     for (int i = 0; i < 4; i++) {
-        //         params[i].value = params[i].value;
-        //     }
-        // }
-
         if (UI.displayMode == EDIT){
             params[i] = UI.updateParameter(params[i]);
         }

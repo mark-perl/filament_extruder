@@ -28,7 +28,7 @@ time.sleep(5)
 file = open(filename, 'a+', newline='')
 csvwriter = csv.writer(file, dialect='excel', delimiter=',')
 header = ["Mode", "Tensioner Speed", "Spooler Speed", "Measured Diameter"]
-csvwriter.writerow(header)
+# csvwriter.writerow(header)
 print(header)
 
 try:
